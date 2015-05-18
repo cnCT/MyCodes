@@ -1,8 +1,8 @@
 package.path = package.path .. ";../?.lua;"
 require "runable"
-local map = {
+map = {
 {0,0,5,5,5,5,5,0,0},
-{4,0,5,5,6,2,6,0,3},
+{4,0,5,5,6,5,6,0,3},
 {3,2,5,5,5,5,5,2,1},
 {3,2,4,5,4,5,1,2,2},
 {2,3,4,5,3,4,1,4,5},
@@ -55,7 +55,7 @@ end
 
 function checkClashPoint( x,y )
 	-- body
-	print("x,y -- ",x,y)
+	-- print("x,y -- ",x,y)
 	local eliminate = eliminateArray.eliminateX[y]
 	if not eliminate then return end
 	-- dump(eliminate,"eliminate")
@@ -114,7 +114,7 @@ function iterateMap( _mapArray,_isT )
 					-- dump(_tmpEliminate,"_tmpEliminate "..i)
 					desArray[i][#desArray[i]+1]={array=tmpEliminate[startPos],len=len} --将满足条件的连续数组插入可消除数组中
 					copy(clashs,clashPoints)
-					dump(clashs,"Clashs")
+					-- dump(clashs,"Clashs")
 			    end
 			    tmpEliminate[startPos] = nil 	--将不符合条件的连续数组置空
 			    len = 1
@@ -157,7 +157,7 @@ function checkSelfIsTrible( k,eliminateFriute )
 	local count = 0
 	local max = 0
 	local min = 10
-	dump(eliminateFriute,k)
+	-- dump(eliminateFriute,k)
 	for _,v in pairs(eliminateFriute) do
 		count = count + 1
 		max = math.max(max,v)
@@ -174,7 +174,7 @@ end
 --用于获取指定类型的数组 --TODO 改为存储Point
 function getArrayByType( _type,centre,array )
 	-- body
-	print("WTF?/?")
+	-- print("WTF?/?")
 	return {ftype=_type,centre=centre,array=array}
 end
 
@@ -192,9 +192,9 @@ function processClashs( ... )
 		local x,y,xi,yi = v.x,v.y,v.xi,v.yi
 		local xArray = eliminateArray.eliminateX[x][xi]
 		local yArray = eliminateArray.eliminateY[y][yi]
-		print("x,y,xi,yi", x,y,xi,yi)
-		dump(xArray,"xArray")
-		dump(yArray,"yArray")
+		-- print("x,y,xi,yi", x,y,xi,yi)
+		-- dump(xArray,"xArray")
+		-- dump(yArray,"yArray")
 		if xArray and yArray then
 			local priority = Priority.CROSS + math.max(Priority.FIVE,math.max(xArray.len,yArray.len))
 			local array = {}
@@ -232,9 +232,9 @@ end
 function processLast( ... )
 	-- body
 	for k,v in pairs(eliminateArray.eliminateX) do
-		print("SSSSXXX")
+		-- print("SSSSXXX")
 		for kk,vv in pairs(v) do
-			print("XX",k,vv.len)
+			-- print("XX",k,vv.len)
 			if vv.len>=3 then
 				local priority = math.max(Priority.FIVE,vv.len)
 				local array = {}
@@ -244,9 +244,9 @@ function processLast( ... )
 		end
 	end
 	for k,v in pairs(eliminateArray.eliminateY) do
-		print("SSSSYYY")
+		-- print("SSSSYYY")
 		for kk,vv in pairs(v) do
-			print("YY",k,vv.len)
+			-- print("YY",k,vv.len)
 			if vv.len>=3 then
 				local priority = math.max(Priority.FIVE,vv.len)
 				local array = {}
@@ -262,11 +262,12 @@ print2_DArray(map)
 initTestMap(mapArray, mapArrayT)
 iterateMap(mapArray,false)
 iterateMap(mapArrayT,true)
-dump(eliminateArray)
-dump(clashPoints)
+-- dump(eliminateArray)
+-- dump(clashPoints)
 table.sort( clashPoints, sortFunc )
-dump(clashPoints)
+-- dump(clashPoints)
 processClashs()
 processLast()
-dump(eliminateFormatArray,"eliminateFormatArray")
-dump(eliminateArray)
+-- dump(eliminateFormatArray,"eliminateFormatArray")
+-- dump(eliminateArray)
+return eliminateFormatArray
