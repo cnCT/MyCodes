@@ -120,7 +120,7 @@ function Eliminate2DArrayMoudle:doEliminate( ... )
 	printClock("--- Eliminate2DArrayMoudle:doEliminate Start3~~~~~~")
 	self:iterateMap(self.mapArrayT,true)
 	printClock("--- Eliminate2DArrayMoudle:doEliminate Start4~~~~~~")
-	dump(self.eliminateArray,"self.eliminateArray")
+	-- dump(self.eliminateArray,"self.eliminateArray")
 	local flag = (next(self.eliminateArray.eliminateX) or next(self.eliminateArray.eliminateY))
 	return flag,self.eliminateArray
 end
@@ -156,7 +156,7 @@ function EliminateModel:initTestMap( _mapArray,_mapArrayT )
 	for x,v in pairs(map) do
 		for y,vv in pairs(v) do
 			_mapArray[x] = _mapArray[x] or {}
-			_mapArray[x][y] = vv
+			_mapArray[x][y] = 1
 			_mapArrayT[y] = _mapArrayT[y] or {}
 			_mapArrayT[y][x] = _mapArray[x][y]
 		end
@@ -237,9 +237,9 @@ function EliminateModel:checkSelfIsTrible( k,eliminateFriute ) 			--不科学~
 		end
 	end
 	if count>=4 and (max-k>=3 or k-min>=3) then
-		return false
+		return true
 	end
-	return true
+	return false
 end
 
 local function three(flag,arg1,arg2)
