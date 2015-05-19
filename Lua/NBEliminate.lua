@@ -171,14 +171,14 @@ function checkSelfIsTrible( k,eliminateFriute )
 	return false
 end
 
---用于获取指定类型的数组 --TODO 改为存储Point
+--用于获取指定类型的数组
 function getArrayByType( _type,centre,array )
 	-- body
 	-- print("WTF?/?")
 	return {ftype=_type,centre=centre,array=array}
 end
 
-function copyTo( index,array,destArray,_isT )
+function pointCopyTo( index,array,destArray,_isT )
 	-- body
 	for _,v in pairs(array) do
 		destArray[#destArray+1] = _isT and {v,index} or {index,v}
@@ -198,7 +198,7 @@ function processClashs( ... )
 		if xArray and yArray then
 			local priority = Priority.CROSS + math.max(Priority.FIVE,math.max(xArray.len,yArray.len))
 			local array = {}
-			copyTo(y,yArray.array,copyTo(x,xArray.array,array),true)
+			pointCopyTo(y,yArray.array,pointCopyTo(x,xArray.array,array),true)
 			eliminateFormatArray[#eliminateFormatArray+1] = getArrayByType(priority,{x,y},array)
 			eliminateArray.eliminateX[x][xi] = nil
 			eliminateArray.eliminateY[y][yi] = nil
@@ -238,7 +238,7 @@ function processLast( ... )
 			if vv.len>=3 then
 				local priority = math.max(Priority.FIVE,vv.len)
 				local array = {}
-				copyTo(k,vv.array,array)
+				pointCopyTo(k,vv.array,array)
 				eliminateFormatArray[#eliminateFormatArray+1] = getArrayByType(priority,array[1],array)
 			end
 		end
@@ -250,7 +250,7 @@ function processLast( ... )
 			if vv.len>=3 then
 				local priority = math.max(Priority.FIVE,vv.len)
 				local array = {}
-				copyTo(k,vv.array,array,true)
+				pointCopyTo(k,vv.array,array,true)
 				eliminateFormatArray[#eliminateFormatArray+1] = getArrayByType(priority,array[1],array)
 			end
 		end
