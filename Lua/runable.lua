@@ -6,6 +6,7 @@ local _,endPos = string.find(pwd,srcDir)
 pwd = string.sub(pwd,0,endPos)
 
 package.path = pwd ..'/?.lua;'.. pwd ..'/luaFramework/?.lua;'.. pwd ..'/luaFramework/red/?.lua;'.. pwd ..'/luaFramework/cc/mvc/?.lua;'.. pwd ..'/luaFramework/cc/components/behavior/?.lua;'.. pwd ..'/luaFramework/cc/?.lua;'.. pwd ..'/CustomGoods/?.lua;'.. pwd ..'/Eliminate/?.lua;'.. pwd ..'/Stage/?.lua;'.. pwd ..'/Data/ScoreConfig/?.lua;'
+package.path = package.path .. pwd .. "/Grid/?.lua;"
 
 GV_MUSICE_EX = ".mp3"
 require "functions"

@@ -1,5 +1,6 @@
 package.path = package.path .. ";../?.lua;"
 require "runable"
+local Eliminate = {}
 map = {
 {0,0,5,5,5,5,5,0,0},
 {4,0,5,5,6,5,6,0,3},
@@ -35,13 +36,22 @@ function print2_DArray( array )
 	print()
 end
 
-local mapArray = {}
-local mapArrayT = {}
-local eliminateArray = {eliminateX = {},eliminateY = {}}
-local eliminateFormatArray = {}
-local clashPoints = {}
+function Eliminate:ctor( ... )
+	-- body
 
-function initTestMap( _mapArray,_mapArrayT )
+end
+
+function Eliminate:init( ... )
+	-- body
+	self.mapArray = {}
+	self.mapArrayT = {}
+	self.eliminateArray = {eliminateX = {},eliminateY = {}}
+	self.eliminateFormatArray = {}
+	self.clashPoints = {}
+end
+
+
+function Eliminate:initTestMap( _mapArray,_mapArrayT )
 	-- body
 	for x,v in pairs(map) do
 		for y,vv in pairs(v) do
@@ -53,10 +63,10 @@ function initTestMap( _mapArray,_mapArrayT )
 	end
 end
 
-function checkClashPoint( x,y )
+function Eliminate:checkClashPoint( x,y )
 	-- body
 	-- print("x,y -- ",x,y)
-	local eliminate = eliminateArray.eliminateX[y]
+	local eliminate = self.eliminateArray.eliminateX[y]
 	if not eliminate then return end
 	-- dump(eliminate,"eliminate")
 	for k,v in pairs(eliminate) do
@@ -67,7 +77,7 @@ function checkClashPoint( x,y )
 	return false
 end
 
-function copy( srcTable,destTable )
+local function copy( srcTable,destTable )
 	-- body
 	for i,v in ipairs(srcTable) do
 		destTable[#destTable+1] = v
@@ -75,7 +85,7 @@ function copy( srcTable,destTable )
 	return destTable
 end
 
-function iterateMap( _mapArray,_isT )
+function Eliminate:iterateMap( _mapArray,_isT )
  	-- body
  	local mapArray = _mapArray
  	local xCount = _isT and yCount or xCount --如果为转置 则互换x y值
@@ -86,10 +96,10 @@ function iterateMap( _mapArray,_isT )
 		local len = 1 	--连续相同水果长度
 		tmpEliminate[startPos] = {} 	--初始化第一个连续数组
 		tmpEliminate[startPos][startPos] = startPos
-   		local desArray = _isT and eliminateArray.eliminateY or eliminateArray.eliminateX
+   		local desArray = _isT and self.eliminateArray.eliminateY or self.eliminateArray.eliminateX
 	 	local clashs = {}
 		if _isT then
-			local ff,index = checkClashPoint(i,startPos)
+			local ff,index = self:checkClashPoint(i,startPos)
 			if ff then
 				local yi = desArray[i] and #desArray[i]+1 or 1
 				clashs[#clashs+1] = {x=startPos,y=i,xi=index,yi=yi}
@@ -97,7 +107,7 @@ function iterateMap( _mapArray,_isT )
 		end
 		for j=2,yCount+1 do
 			if _isT then
-				local ff,index = checkClashPoint(i,j)
+				local ff,index = self:checkClashPoint(i,j)
 				if ff then
 					local yi = desArray[i] and #desArray[i]+1 or 1
 					clashs[#clashs+1] = {x=j,y=i,xi=index,yi=yi}
@@ -113,7 +123,7 @@ function iterateMap( _mapArray,_isT )
 					desArray[i] = desArray[i] or {}
 					-- dump(_tmpEliminate,"_tmpEliminate "..i)
 					desArray[i][#desArray[i]+1]={array=tmpEliminate[startPos],len=len} --将满足条件的连续数组插入可消除数组中
-					copy(clashs,clashPoints)
+					copy(clashs,self.clashPoints)
 					-- dump(clashs,"Clashs")
 			    end
 			    tmpEliminate[startPos] = nil 	--将不符合条件的连续数组置空
@@ -131,28 +141,33 @@ function iterateMap( _mapArray,_isT )
 	end
 end
 
-local function sortFunc( a,b )
+function Eliminate:sortClashsPoints( ... )
 	-- body
-	local function getPri( v )
+	local function sortFunc( a,b )
 		-- body
-		local x,y,xi,yi = v.x,v.y,v.xi,v.yi
-		local xLen = eliminateArray.eliminateX[x][xi].len
-		local yLen = eliminateArray.eliminateY[y][yi].len
-		local len = 0
-		if xLen>=5 then
-			len = len + xCount
+		local function getPri( v )
+			-- body
+			local x,y,xi,yi = v.x,v.y,v.xi,v.yi
+			local xLen = self.eliminateArray.eliminateX[x][xi].len
+			local yLen = self.eliminateArray.eliminateY[y][yi].len
+			local len = 0
+			if xLen>=5 then
+				len = len + xCount
+			end
+			if yLen>=5 then
+				len = len + yCount
+			end
+			len = len + xLen + yLen
+			return len
 		end
-		if yLen>=5 then
-			len = len + yCount
-		end
-		len = len + xLen + yLen
-		return len
+		return getPri(a)>getPri(b)
 	end
-	return getPri(a)>getPri(b)
+
+	table.sort( self.clashPoints, sortFunc )
 end
 
 --判断自身是否为有效消除数组 返回被剔除的元素下标
-function checkSelfIsTrible( k,eliminateFriute )
+function Eliminate:checkSelfIsTrible( k,eliminateFriute )
 	-- body
 	local count = 0
 	local max = 0
@@ -172,13 +187,13 @@ function checkSelfIsTrible( k,eliminateFriute )
 end
 
 --用于获取指定类型的数组
-function getArrayByType( _type,centre,array )
+function Eliminate:getArrayByType( _type,centre,array )
 	-- body
 	-- print("WTF?/?")
 	return {ftype=_type,centre=centre,array=array}
 end
 
-function pointCopyTo( index,array,destArray,_isT )
+function Eliminate:pointCopyTo( index,array,destArray,_isT )
 	-- body
 	for _,v in pairs(array) do
 		destArray[#destArray+1] = _isT and {v,index} or {index,v}
@@ -186,88 +201,94 @@ function pointCopyTo( index,array,destArray,_isT )
 	return destArray
 end
 
-function processClashs( ... )
+function Eliminate:processClashs( ... )
 	-- body
-	for i,v in ipairs(clashPoints) do
+	for i,v in ipairs(self.clashPoints) do
 		local x,y,xi,yi = v.x,v.y,v.xi,v.yi
-		local xArray = eliminateArray.eliminateX[x][xi]
-		local yArray = eliminateArray.eliminateY[y][yi]
+		local xArray = self.eliminateArray.eliminateX[x][xi]
+		local yArray = self.eliminateArray.eliminateY[y][yi]
 		-- print("x,y,xi,yi", x,y,xi,yi)
 		-- dump(xArray,"xArray")
 		-- dump(yArray,"yArray")
 		if xArray and yArray then
 			local priority = Priority.CROSS + math.max(Priority.FIVE,math.max(xArray.len,yArray.len))
 			local array = {}
-			pointCopyTo(y,yArray.array,pointCopyTo(x,xArray.array,array),true)
-			eliminateFormatArray[#eliminateFormatArray+1] = getArrayByType(priority,{x,y},array)
-			eliminateArray.eliminateX[x][xi] = nil
-			eliminateArray.eliminateY[y][yi] = nil
+			self:pointCopyTo(y,yArray.array,self:pointCopyTo(x,xArray.array,array),true)
+			self.eliminateFormatArray[#self.eliminateFormatArray+1] = self:getArrayByType(priority,{x,y},array)
+			self.eliminateArray.eliminateX[x][xi] = nil
+			self.eliminateArray.eliminateY[y][yi] = nil
 		else
 			if xArray then
-				local flag,r1,r2 = checkSelfIsTrible(y,xArray.array)
+				local flag,r1,r2 = self:checkSelfIsTrible(y,xArray.array)
 				if flag then
 					for i=r1,r2 do
 						xArray.array[i] = nil
 						xArray.len = xArray.len - 1
 					end
 				else
-					eliminateArray.eliminateX[x][xi] = nil
+					self.eliminateArray.eliminateX[x][xi] = nil
 				end
 			end
 			if yArray then
-				local flag,r1,r2 = checkSelfIsTrible(x,yArray.array)
+				local flag,r1,r2 = self:checkSelfIsTrible(x,yArray.array)
 				if flag then
 					for i=r1,r2 do
 						yArray.array[i] = nil
 						yArray.len = yArray.len - 1
 					end
 				else
-					eliminateArray.eliminateY[y][yi] = nil
+					self.eliminateArray.eliminateY[y][yi] = nil
 				end
 			end
 		end
 	end
 end
 
-function processLast( ... )
+function Eliminate:processLast( ... )
 	-- body
-	for k,v in pairs(eliminateArray.eliminateX) do
+	for k,v in pairs(self.eliminateArray.eliminateX) do
 		-- print("SSSSXXX")
 		for kk,vv in pairs(v) do
 			-- print("XX",k,vv.len)
 			if vv.len>=3 then
 				local priority = math.max(Priority.FIVE,vv.len)
 				local array = {}
-				pointCopyTo(k,vv.array,array)
-				eliminateFormatArray[#eliminateFormatArray+1] = getArrayByType(priority,array[1],array)
+				self:pointCopyTo(k,vv.array,array)
+				self.eliminateFormatArray[#self.eliminateFormatArray+1] = self:getArrayByType(priority,array[1],array)
 			end
 		end
 	end
-	for k,v in pairs(eliminateArray.eliminateY) do
+	for k,v in pairs(self.eliminateArray.eliminateY) do
 		-- print("SSSSYYY")
 		for kk,vv in pairs(v) do
 			-- print("YY",k,vv.len)
 			if vv.len>=3 then
 				local priority = math.max(Priority.FIVE,vv.len)
 				local array = {}
-				pointCopyTo(k,vv.array,array,true)
-				eliminateFormatArray[#eliminateFormatArray+1] = getArrayByType(priority,array[1],array)
+				self:pointCopyTo(k,vv.array,array,true)
+				self.eliminateFormatArray[#self.eliminateFormatArray+1] = self:getArrayByType(priority,array[1],array)
 			end
 		end
 	end
 	printClock()
 end
 
-print2_DArray(map)
-initTestMap(mapArray, mapArrayT)
-iterateMap(mapArray,false)
-iterateMap(mapArrayT,true)
--- dump(eliminateArray)
--- dump(clashPoints)
-table.sort( clashPoints, sortFunc )
--- dump(clashPoints)
-processClashs()
-processLast()
--- dump(eliminateFormatArray,"eliminateFormatArray")
--- dump(eliminateArray)
-return eliminateFormatArray
+function Eliminate:doEliminate( ... )
+	-- body
+	print2_DArray(map)
+	self:init()
+	self:initTestMap(self.mapArray, self.mapArrayT)
+	self:iterateMap(self.mapArray,false)
+	self:iterateMap(self.mapArrayT,true)
+	-- dump(eliminateArray)
+	-- dump(clashPoints)
+	self:sortClashsPoints()
+	-- dump(clashPoints)
+	self:processClashs()
+	self:processLast()
+	-- dump(self.eliminateFormatArray,"eliminateFormatArray")
+	-- dump(eliminateArray)
+	return self.eliminateFormatArray
+end
+
+return Eliminate:doEliminate()
