@@ -56,7 +56,7 @@ function Eliminate:initTestMap( _mapArray,_mapArrayT )
 	for x,v in pairs(map) do
 		for y,vv in pairs(v) do
 			_mapArray[x] = _mapArray[x] or {}
-			_mapArray[x][y] = vv
+			_mapArray[x][y] = 1 or vv
 			_mapArrayT[y] = _mapArrayT[y] or {}
 			_mapArrayT[y][x] = _mapArray[x][y]
 		end
@@ -207,9 +207,9 @@ function Eliminate:processClashs( ... )
 		local x,y,xi,yi = v.x,v.y,v.xi,v.yi
 		local xArray = self.eliminateArray.eliminateX[x][xi]
 		local yArray = self.eliminateArray.eliminateY[y][yi]
-		-- print("x,y,xi,yi", x,y,xi,yi)
-		-- dump(xArray,"xArray")
-		-- dump(yArray,"yArray")
+		print("x,y,xi,yi", x,y,xi,yi)
+		dump(xArray,"xArray")
+		dump(yArray,"yArray")
 		if xArray and yArray then
 			local priority = Priority.CROSS + math.max(Priority.FIVE,math.max(xArray.len,yArray.len))
 			local array = {}
@@ -286,9 +286,9 @@ function Eliminate:doEliminate( ... )
 	-- dump(clashPoints)
 	self:processClashs()
 	self:processLast()
-	-- dump(self.eliminateFormatArray,"eliminateFormatArray")
+	dump(self.eliminateFormatArray,"eliminateFormatArray")
 	-- dump(eliminateArray)
 	return self.eliminateFormatArray
 end
 
-return Eliminate:doEliminate()
+-- return Eliminate:doEliminate()

@@ -29,7 +29,7 @@ local baseClockTime = os.clock()
 printClock = function( ... )
     -- body
     print(...)
-    print(string.format("Clock is %.3f",os.clock()-baseClockTime))
+    print(string.format("Clock is %.5f",os.clock()-baseClockTime))
 end
 
 --打印某对象的值
