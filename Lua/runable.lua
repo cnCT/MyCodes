@@ -30,6 +30,7 @@ printClock = function( ... )
     -- body
     print(...)
     print(string.format("Clock is %.5f",os.clock()-baseClockTime))
+    baseClockTime = os.clock()
 end
 
 --打印某对象的值
